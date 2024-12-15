@@ -5,14 +5,14 @@ import {
   Index,
   JoinColumn,
   OneToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Book } from './books.entity';
 
 @Entity('book_metadata')
 export class BookMetadata {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Index()
@@ -41,7 +41,9 @@ export class BookMetadata {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => Book, (book) => book.metadata)
-  @JoinColumn({ name: 'book_id' })
+  @OneToOne(() => Book, (book) => book.metadata, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'id', referencedColumnName: 'id' })
   book: Book;
 }

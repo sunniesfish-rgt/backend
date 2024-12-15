@@ -20,11 +20,13 @@ import {
   BookNotFoundException,
   BookOperationException,
 } from './exceptions/book.exception';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
+  @Public()
   @Get('')
   async getAllBooks(
     @Query() searchDto: SearchBookDto,
@@ -50,7 +52,6 @@ export class BooksController {
       }
       return book;
     } catch (error) {
-      console.log('error', error);
       if (error instanceof BookNotFoundException) {
         throw error;
       }

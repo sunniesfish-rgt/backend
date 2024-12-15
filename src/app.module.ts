@@ -6,6 +6,7 @@ import { BooksModule } from './books/books.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionsFilter } from './common/filters/exception.filter';
 import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
     BooksModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

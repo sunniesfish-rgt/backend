@@ -76,7 +76,6 @@ export class BooksService {
 
   async findOne(id: string): Promise<Book | undefined> {
     try {
-      console.log('findOne');
       const book = await this.booksRepository.findOne({
         where: { id },
         relations: ['metadata'],
@@ -114,34 +113,30 @@ export class BooksService {
   ): Promise<UpdateResult> {
     try {
       return this.dataSource.transaction(async (manager) => {
-        const book = await manager.findOne(Book, { where: { id } });
+        const book = await manager.findOne(Book, {
+          where: { id },
+          relations: ['metadata'],
+        });
         if (!book) {
           throw new BookNotFoundException(id);
         }
-        if (!updateBookDto.bookdata && !updateBookDto.metadata) {
-          throw new BookOperationException(
-            '업데이트',
-            '업데이트할 데이터가 없습니다',
-          );
-        }
-        if (!updateBookDto.bookdata) {
-          return manager.update(BookMetadata, id, {
-            ...updateBookDto.metadata,
-            title: updateBookDto.title,
-            author: updateBookDto.author,
-          });
-        }
-        if (!updateBookDto.metadata) {
-          return manager.update(Book, id, {
-            ...updateBookDto.bookdata,
-            title: updateBookDto.title,
-            author: updateBookDto.author,
-          });
-        }
-        return manager.update(Book, id, {
+
+        await manager.update(Book, id, {
+          title: updateBookDto.title,
+          author: updateBookDto.author,
+          publishedDate: updateBookDto.publishedDate,
+          coverImage: updateBookDto.coverImage,
+          coverImageThumbnail: updateBookDto.coverImageThumbnail,
+          description: updateBookDto.description,
+        });
+
+        await manager.update(BookMetadata, book.metadata.id, {
+          ...updateBookDto.metadata,
           title: updateBookDto.title,
           author: updateBookDto.author,
         });
+
+        return { affected: 1, raw: [], generatedMaps: [] };
       });
     } catch (error) {
       throw new BookOperationException('업데이트', error.message);

@@ -7,6 +7,7 @@ import {
   Res,
   UseGuards,
   UseFilters,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -61,9 +62,15 @@ export class AuthController {
   }
 
   @Public()
-  @Post('check-user-id  ')
+  @Post('check-user-id')
   @HttpCode(HttpStatus.OK)
   async checkUserId(@Body('userId') userId: string): Promise<boolean> {
-    return await this.authService.checkUserId(userId);
+    return !(await this.authService.checkUserId(userId));
+  }
+
+  @Get('check-auth')
+  @HttpCode(HttpStatus.OK)
+  async checkAuth(): Promise<boolean> {
+    return true;
   }
 }

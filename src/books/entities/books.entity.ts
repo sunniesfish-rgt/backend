@@ -35,6 +35,7 @@ export class Book {
 
   @OneToOne(() => BookMetadata, (metadata) => metadata.book, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   metadata: BookMetadata;
 }
