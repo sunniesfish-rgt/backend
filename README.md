@@ -48,6 +48,7 @@ $ npm install
 - 도서 삭제 `/api/books/:id`
 
 ## 프로젝트 구조
+```
 src/
 ├── auth/            # 인증 관련 모듈
 │   ├── controllers/ # 인증 컨트롤러
@@ -65,7 +66,7 @@ src/
 │   ├── decorators/  # 커스텀 데코레이터
 │   └── utils/       # 공통 유틸리티 함수
 └── config/          # 설정 파일
-
+```
 
 ## 보안
 
