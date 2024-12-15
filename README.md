@@ -49,22 +49,23 @@ $ npm install
 
 ## 프로젝트 구조
 src/
-├── auth/ # 인증 관련 모듈
-│ ├── controllers/
-│ ├── services/
-│ ├── guards/
-│ ├── strategies/
-│ └── entities/
-├── books/ # 도서 관리 모듈
-│ ├── controllers/
-│ ├── services/
-│ ├── entities/
-│ └── dtos/
-├── common/ # 공통 모듈
-│ ├── filters/
-│ ├── decorators/
-│ └── utils/
-└── config/ # 설정 파일
+├── auth/            # 인증 관련 모듈
+│   ├── controllers/ # 인증 컨트롤러
+│   ├── services/    # 인증 서비스
+│   ├── guards/      # 인증 가드
+│   ├── strategies/  # 인증 전략
+│   └── entities/    # 인증 엔티티
+├── books/           # 도서 관리 모듈
+│   ├── controllers/ # 도서 관리 컨트롤러
+│   ├── services/    # 도서 관리 서비스
+│   ├── entities/    # 도서 엔티티
+│   └── dtos/        # 데이터 전송 객체
+├── common/          # 공통 모듈
+│   ├── filters/     # 예외 필터
+│   ├── decorators/  # 커스텀 데코레이터
+│   └── utils/       # 공통 유틸리티 함수
+└── config/          # 설정 파일
+
 
 ## 보안
 
