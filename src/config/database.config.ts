@@ -25,6 +25,7 @@ export default registerAs(
       process.env.NODE_ENV !== 'production'
         ? process.env.DB_DATABASE_DEV
         : process.env.DB_DATABASE,
+    entities: ['dist/**/*.entity{.ts,.js}'],
     synchronize: process.env.NODE_ENV !== 'production',
     logging: process.env.NODE_ENV !== 'production',
   }),

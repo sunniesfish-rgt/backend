@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   Query,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dtos/create-book.dto';
@@ -15,6 +16,10 @@ import { SearchBookDto } from './dtos/search-book.dto';
 import { BookMetadata } from './entities/book-metadata.entity';
 import { PaginatedResponse } from 'src/common/dtos/pagenation.dto';
 import { Book } from './entities/books.entity';
+import {
+  BookNotFoundException,
+  BookOperationException,
+} from './exceptions/book.exception';
 
 @Controller('books')
 export class BooksController {
@@ -24,17 +29,47 @@ export class BooksController {
   async getAllBooks(
     @Query() searchDto: SearchBookDto,
   ): Promise<PaginatedResponse<BookMetadata>> {
-    return this.booksService.findAll(searchDto);
+    try {
+      return await this.booksService.findAll(searchDto);
+    } catch (error) {
+      if (error instanceof BookOperationException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        '도서 목록을 가져오는데 실패했습니다.',
+      );
+    }
   }
 
   @Get(':id')
   async getBookById(@Param('id') id: string): Promise<Book> {
-    return this.booksService.findOne(id);
+    try {
+      const book = await this.booksService.findOne(id);
+      if (!book) {
+        throw new BookNotFoundException(id);
+      }
+      return book;
+    } catch (error) {
+      console.log('error', error);
+      if (error instanceof BookNotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        '도서 정보를 가져오는데 실패했습니다.',
+      );
+    }
   }
 
   @Post()
   async createBook(@Body() createBookDto: CreateBookDto): Promise<Book> {
-    return this.booksService.create(createBookDto);
+    try {
+      return await this.booksService.create(createBookDto);
+    } catch (error) {
+      if (error instanceof BookOperationException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('도서 생성에 실패했습니다.');
+    }
   }
 
   @Put(':id')
@@ -42,13 +77,27 @@ export class BooksController {
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
   ): Promise<boolean> {
-    const result = await this.booksService.update(id, updateBookDto);
-    return result.affected > 0;
+    try {
+      const result = await this.booksService.update(id, updateBookDto);
+      return result.affected > 0;
+    } catch (error) {
+      if (error instanceof BookOperationException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('도서 수정에 실패했습니다.');
+    }
   }
 
   @Delete(':id')
   async deleteBook(@Param('id') id: string): Promise<boolean> {
-    const result = await this.booksService.remove(id);
-    return result.affected > 0;
+    try {
+      const result = await this.booksService.remove(id);
+      return result.affected > 0;
+    } catch (error) {
+      if (error instanceof BookOperationException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('도서 삭제에 실패했습니다.');
+    }
   }
 }

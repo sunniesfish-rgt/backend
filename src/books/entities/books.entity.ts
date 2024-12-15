@@ -4,7 +4,6 @@ import {
   Column,
   Index,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { BookMetadata } from './book-metadata.entity';
 
@@ -34,7 +33,8 @@ export class Book {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToOne(() => BookMetadata, (metadata) => metadata.book)
-  @JoinColumn({ name: 'id' })
+  @OneToOne(() => BookMetadata, (metadata) => metadata.book, {
+    cascade: true,
+  })
   metadata: BookMetadata;
 }

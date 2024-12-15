@@ -26,7 +26,13 @@ export class BookMetadata {
   @Column({ type: 'int', default: 0 })
   stockQuantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    default: 0,
+  })
   price: number;
 
   @CreateDateColumn()

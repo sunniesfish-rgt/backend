@@ -11,7 +11,7 @@ import { calculatePaginationMeta } from 'src/common/utils/pagenation.util';
 import {
   BookNotFoundException,
   BookOperationException,
-} from './book.exceptions';
+} from './exceptions/book.exception';
 
 @Injectable()
 export class BooksService {
@@ -27,30 +27,56 @@ export class BooksService {
     searchDto: SearchBookDto,
   ): Promise<PaginatedResponse<BookMetadata>> {
     try {
-      const { page, limit, order, title, author } = searchDto;
+      const { page, limit, order, title, author } =
+        this.validateSearchParams(searchDto);
+
       const query =
         this.bookMetadataRepository.createQueryBuilder('book_metadata');
+
       if (title) {
-        query.andWhere('book_metadata.title LIKE :title', { title });
+        query.andWhere('book_metadata.title LIKE :title', {
+          title: `%${this.escapeSearchString(title)}%`,
+        });
       }
       if (author) {
-        query.andWhere('book_metadata.author LIKE :author', { author });
+        query.andWhere('book_metadata.author LIKE :author', {
+          author: `%${this.escapeSearchString(author)}%`,
+        });
       }
-      query.orderBy('book_metadata.createdAt', order);
+
       const skip = (page - 1) * limit;
+
       const [data, total] = await query
+        .orderBy('book_metadata.createdAt', order)
         .skip(skip)
         .take(limit)
         .getManyAndCount();
-      const meta = calculatePaginationMeta(total, page, limit);
-      return { data, meta };
+
+      if (!data.length && total > 0) {
+        throw new BookOperationException(
+          '조회',
+          '페이지가 범위를 벗어났습니다.',
+        );
+      }
+
+      return {
+        data,
+        meta: calculatePaginationMeta(total, page, limit),
+      };
     } catch (error) {
-      throw new BookOperationException('조회', error.message);
+      if (error instanceof BookOperationException) {
+        throw error;
+      }
+      throw new BookOperationException(
+        '도서 목록 조회 중 오류가 발생했습니다',
+        error.message,
+      );
     }
   }
 
   async findOne(id: string): Promise<Book | undefined> {
     try {
+      console.log('findOne');
       const book = await this.booksRepository.findOne({
         where: { id },
         relations: ['metadata'],
@@ -128,5 +154,35 @@ export class BooksService {
     } catch (error) {
       throw new BookOperationException('삭제', error.message);
     }
+  }
+
+  private validateSearchParams(searchDto: SearchBookDto): SearchBookDto {
+    const { page = 1, limit = 10, order = 'DESC', title, author } = searchDto;
+    if (page < 1) {
+      throw new BookOperationException(
+        '조회',
+        '페이지 번호는 1 이상이어야 합니다.',
+      );
+    }
+    if (limit < 1 || limit > 100) {
+      throw new BookOperationException(
+        '조회',
+        '한 페이지당 항목 수는 1-100 사이여야 합니다.',
+      );
+    }
+    if (!['ASC', 'DESC'].includes(order)) {
+      throw new BookOperationException('조회', '정렬 순서가 잘못되었습니다.');
+    }
+    return {
+      page,
+      limit,
+      order,
+      title,
+      author,
+    };
+  }
+
+  private escapeSearchString(str: string): string {
+    return str.replace(/[%_\\]/g, '\\$&');
   }
 }
