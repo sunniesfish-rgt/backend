@@ -1,9 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('app')
+@Controller('')
 export class AppController {
   @Get()
   getHello(): string {
-    return 'Hello World!';
+    return JSON.stringify({ message: 'Hello World!' });
   }
 }
