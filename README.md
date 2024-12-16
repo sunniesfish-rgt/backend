@@ -10,14 +10,7 @@
 - TypeScript
 - MySQL (with TypeORM)
 - JWT Authentication
-- Class Validator
-- Cookie Parser
 
-## 시스템 요구사항
-
-- Node.js 18.x 이상
-- MySQL 8.x
-- npm 또는 yarn
 
 ## 설치 및 실행
 
@@ -110,10 +103,4 @@ API 문서는 각 모듈의 README.md 파일에서 확인할 수 있습니다:
 - [인증 API 문서](src/auth/README.md)
 - [도서 관리 API 문서](src/books/README.md)
 
-## 배포 가이드
 
-1. 프로덕션 환경 변수 설정
-
-   - `.env` 파일 생성
-   - 프로덕션 데이터베이스 정보 설정
-   - JWT 시크릿 키 설정
